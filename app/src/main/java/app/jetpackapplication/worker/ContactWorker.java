@@ -1,27 +1,33 @@
 package app.jetpackapplication.worker;
 
-import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.StaleDataException;
 import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.work.Worker;
 import app.jetpackapplication.data.Contacts;
 import app.jetpackapplication.data.SampleDatabase;
 
 public class ContactWorker extends Worker {
 
+    public ContactWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+    }
+
     @NonNull
     @Override
-    public WorkerResult doWork() {
+    public Result doWork() {
         int contacts = updateContacts();
-        return contacts==0?WorkerResult.FAILURE:WorkerResult.SUCCESS;
+        return contacts == 0 ? Result.failure() : Result.success();
     }
 
     private int updateContacts() {
@@ -63,10 +69,10 @@ public class ContactWorker extends Worker {
                         }
 //                        if (number.equalsIgnoreCase(phone))
 //                            continue;
-                        Contacts contacts=new Contacts();
-                        contacts.number=number.replaceAll(" ", "").replaceAll("-", "").replaceAll("\\p{P}", "").replaceAll("\\s+", "");
-                        contacts.code=code;
-                        contacts.name=data.getString(2);
+                        Contacts contacts = new Contacts();
+                        contacts.number = number.replaceAll(" ", "").replaceAll("-", "").replaceAll("\\p{P}", "").replaceAll("\\s+", "");
+                        contacts.code = code;
+                        contacts.name = data.getString(2);
 //                        contentValues = new ContentValues();
 //                        contentValues.put(ContactDataContract.ContactDatabase.CONTACT_CODE, code);
 //                        contentValues.put(ContactDataContract.ContactDatabase.CONTACT_NUMBER, number.replaceAll(" ", "").replaceAll("-", "").replaceAll("\\p{P}", "").replaceAll("\\s+", ""));
@@ -83,8 +89,8 @@ public class ContactWorker extends Worker {
                 if (dataList.size() > 0) {
                     Contacts[] values = new Contacts[dataList.size()];
                     long[] longs = SampleDatabase.getInstance(getApplicationContext()).contacts().insertAll(dataList.toArray(values));
-                    Log.e(getClass().getSimpleName(),String.valueOf(longs[longs.length-1]));
-                    count= (int) longs[longs.length-1];
+                    Log.e(getClass().getSimpleName(), String.valueOf(longs[longs.length - 1]));
+                    count = (int) longs[longs.length - 1];
 //                    getApplicationContext().getContentResolver().bulkInsert(ContactDataContract.ContactDatabase.CONTENT_URI, dataList.toArray(values));
                 }
             }

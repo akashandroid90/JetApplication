@@ -4,6 +4,7 @@
     package="app.jetpackapplication">
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <permission android:name="app.jetpackapplication.contentprovidersample.provider.READ_WRITE"/>
 
     <application
